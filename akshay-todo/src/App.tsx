@@ -1,8 +1,17 @@
 import { useState, useEffect, useRef, useCallback, Component, type ReactNode } from "react";
 
-// ── Calendar / DatePicker ─────────────────────────────────────────────────────
+// ── Calendar / DatePicker / TimePicker ───────────────────────────────────────
 const CAL_MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const CAL_DAYS   = ["Su","Mo","Tu","We","Th","Fr","Sa"];
+
+const TIME_SLOTS = Array.from({ length: 36 }, (_, i) => {
+  const mins = 6 * 60 + i * 30;
+  const h = Math.floor(mins / 60), m = mins % 60;
+  const value = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+  const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+  const label = `${h12}:${String(m).padStart(2, "0")} ${h < 12 ? "AM" : "PM"}`;
+  return { value, label };
+});
 
 function CalendarPopover({ value, min, onChange, onClose }: {
   value: string; min?: string;
@@ -79,6 +88,56 @@ function DatePickerField({ label, value, min, onChange }: {
           {value && <span className="dp-x" role="button" aria-label="Clear" onClick={(e) => { e.stopPropagation(); onChange(""); }}>×</span>}
         </button>
         {open && <CalendarPopover value={value} min={min} onChange={onChange} onClose={() => setOpen(false)} />}
+      </div>
+    </label>
+  );
+}
+
+function TimePickerField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const fn = (e: MouseEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", fn);
+    return () => document.removeEventListener("mousedown", fn);
+  }, [open]);
+
+  const display = value ? (() => {
+    const [h, m] = value.split(":").map(Number);
+    const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+    return `${h12}:${String(m).padStart(2, "0")} ${h < 12 ? "AM" : "PM"}`;
+  })() : null;
+
+  return (
+    <label className="field-group">
+      <span className="field-label">Time <span className="field-label-hint">(optional)</span></span>
+      <div ref={wrapRef} className="dp-wrap">
+        <button type="button" className={`dp-btn${value ? " dp-has-val" : ""}`} onClick={() => setOpen(v => !v)}>
+          <svg className="dp-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <circle cx="10" cy="10" r="8"/>
+            <path d="M10 6v4l2.5 2.5"/>
+          </svg>
+          <span className="dp-text">{display ?? "Pick a time"}</span>
+          {value && <span className="dp-x" role="button" aria-label="Clear" onClick={(e) => { e.stopPropagation(); onChange(""); }}>×</span>}
+        </button>
+        {open && (
+          <div className="tp-popover" onMouseDown={(e) => e.stopPropagation()}>
+            <div className="tp-grid">
+              {TIME_SLOTS.map(slot => (
+                <button key={slot.value} type="button"
+                  className={`tp-slot${slot.value === value ? " tp-sel" : ""}`}
+                  onClick={() => { onChange(slot.value); setOpen(false); }}>
+                  {slot.label}
+                </button>
+              ))}
+            </div>
+            {value && <button type="button" className="cal-clear" onClick={() => { onChange(""); setOpen(false); }}>Clear time</button>}
+          </div>
+        )}
       </div>
     </label>
   );
@@ -186,20 +245,24 @@ function TodoApp() {
   const notified = useRef(new Set<string>());
 
   useEffect(() => {
+    // Load todos
     fetch("/api/todos")
       .then((r) => (r.ok ? r.json() : []))
       .then((data) => setTodos(data as Todo[]))
       .catch(() => setTodos([]))
       .finally(() => setLoading(false));
 
+    // Reminder tick
     const interval = setInterval(() => setTick((t) => t + 1), 30_000);
 
+    // PWA install prompt
     const onPrompt = (e: Event) => {
       e.preventDefault();
       setInstallPrompt(e as BeforeInstallPromptEvent);
     };
     window.addEventListener("beforeinstallprompt", onPrompt);
 
+    // Service worker
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("/sw.js").catch(() => {});
     }
@@ -356,18 +419,10 @@ function TodoApp() {
               min={todayMin}
               onChange={(v) => { setDueDate(v); if (!v) setDueTime(""); }}
             />
-            <label className="field-group">
-              <span className="field-label">Time <span className="field-label-hint">(optional)</span></span>
-              <input
-                type="time"
-                value={dueTime}
-                onChange={(e) => {
-                  setDueTime(e.target.value);
-                  if (e.target.value && !dueDate) setDueDate(todayMin);
-                }}
-                className="date-input"
-              />
-            </label>
+            <TimePickerField
+              value={dueTime}
+              onChange={(v) => { setDueTime(v); if (v && !dueDate) setDueDate(todayMin); }}
+            />
           </div>
 
           <div className="priority-row">
@@ -403,8 +458,7 @@ function TodoApp() {
             </button>
           ))}
           <button
-            onClick={() => setShowDone((v) => !v)
-            }
+            onClick={() => setShowDone((v) => !v)}
             className="filter-chip toggle-done"
           >
             {showDone ? "Hide done" : "Show done"}
