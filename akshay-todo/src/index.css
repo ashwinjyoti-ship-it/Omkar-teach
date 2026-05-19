@@ -10,11 +10,15 @@ body {
     radial-gradient(circle at bottom right, rgba(20, 184, 166, 0.12), transparent 30rem),
     #071018;
   color: #f8fafc;
-  font-family: "Plus Jakarta Sans", "Aptos", "Segoe UI", sans-serif;
+  /* Open Sans mirrors Richmond Medium Italic — the Ask Jeeves brand typeface */
+  font-family: "Open Sans", "Segoe UI", system-ui, sans-serif;
+  font-size: 16px; /* base for rem, prevents iOS zoom on inputs */
   min-height: 100vh;
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1, "liga" 1;
 }
 
 #root { min-height: 100dvh; }
@@ -70,19 +74,21 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .eyebrow {
   margin: 0 0 0.5rem;
   color: #fdba74;
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.14em;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
 }
 
 .hero-card h1 {
   margin: 0;
   color: #f8fafc;
-  font-size: clamp(2rem, 7vw, 4.75rem);
-  font-weight: 900;
-  line-height: 0.95;
-  letter-spacing: -0.07em;
+  /* Bold italic — the Ask Jeeves Richmond Medium Italic spirit */
+  font-style: italic;
+  font-size: clamp(2.1rem, 7.5vw, 4.5rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
 }
 
 .hero-card h1 span {
@@ -91,10 +97,12 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 
 .hero-text {
   max-width: 36rem;
-  margin: 0.9rem 0 0;
+  margin: 0.75rem 0 0;
   color: #cbd5e1;
-  font-size: clamp(0.95rem, 2vw, 1.1rem);
-  line-height: 1.6;
+  font-size: clamp(0.9rem, 2vw, 1rem);
+  font-weight: 400;
+  line-height: 1.65;
+  letter-spacing: 0.01em;
 }
 
 .hero-actions {
@@ -197,8 +205,9 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .task-input {
   min-height: 3.5rem;
   padding: 0.95rem 1rem;
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 1rem; /* 16px — prevents iOS auto-zoom */
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
 
 .task-input::placeholder,
@@ -228,8 +237,8 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   padding: 0.75rem 0.9rem;
   color-scheme: dark;
   color: #e2e8f0;
-  font-size: 0.9rem;
-  font-weight: 700;
+  font-size: 1rem; /* 16px — prevents iOS auto-zoom */
+  font-weight: 600;
 }
 
 .date-input:disabled {
@@ -417,9 +426,10 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .task-title {
   margin: 0;
   color: #f8fafc;
-  font-size: 1rem;
-  font-weight: 800;
-  line-height: 1.45;
+  font-size: 0.9375rem; /* 15px — comfortable mobile read size */
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0.005em;
   overflow-wrap: anywhere;
 }
 
@@ -439,8 +449,10 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   background: rgba(2, 6, 23, 0.45);
   padding: 0.25rem 0.55rem;
   color: #cbd5e1;
-  font-size: 0.74rem;
-  font-weight: 800;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .priority-dot {
