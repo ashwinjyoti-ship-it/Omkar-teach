@@ -7,8 +7,8 @@ html { -webkit-tap-highlight-color: transparent; }
 body {
   background:
     radial-gradient(circle at top left, rgba(255, 107, 0, 0.18), transparent 34rem),
-    radial-gradient(circle at bottom right, rgba(20, 184, 166, 0.12), transparent 30rem),
-    #071018;
+    radial-gradient(circle at bottom right, rgba(249, 115, 22, 0.07), transparent 30rem),
+    #0a0a0a;
   color: #f8fafc;
   /* Open Sans mirrors Richmond Medium Italic — the Ask Jeeves brand typeface */
   font-family: "Open Sans", "Segoe UI", system-ui, sans-serif;
@@ -53,7 +53,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .hero-card,
 .todo-panel {
   border: 1px solid rgba(148, 163, 184, 0.22);
-  background: linear-gradient(145deg, rgba(15, 23, 42, 0.96), rgba(8, 13, 24, 0.94));
+  background: linear-gradient(145deg, rgba(15, 15, 15, 0.97), rgba(8, 8, 8, 0.97));
   box-shadow: 0 24px 90px rgba(0, 0, 0, 0.38);
   backdrop-filter: blur(20px);
 }
@@ -120,7 +120,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   min-height: 2.5rem;
   border-radius: 999px;
   border: 1px solid rgba(148, 163, 184, 0.22);
-  background: rgba(15, 23, 42, 0.72);
+  background: rgba(15, 15, 15, 0.85);
   color: #e2e8f0;
 }
 
@@ -144,7 +144,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 .stats-pill.done strong {
-  color: #5eead4;
+  color: #fb923c;
 }
 
 .secondary-action,
@@ -176,8 +176,8 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 .status-badge {
-  border-color: rgba(45, 212, 191, 0.45);
-  color: #99f6e4;
+  border-color: rgba(249, 115, 22, 0.45);
+  color: #fdba74;
 }
 
 .todo-panel {
@@ -196,7 +196,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   width: 100%;
   border: 1px solid rgba(148, 163, 184, 0.28);
   border-radius: 1rem;
-  background: rgba(2, 6, 23, 0.86);
+  background: rgba(5, 5, 5, 0.92);
   color: #f8fafc;
   outline: none;
   transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
@@ -269,7 +269,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   padding: 0.75rem 0.9rem;
   border: 1px solid rgba(148, 163, 184, 0.28);
   border-radius: 1rem;
-  background: rgba(2, 6, 23, 0.86);
+  background: rgba(5, 5, 5, 0.92);
   color: #64748b;
   font-size: 1rem;
   font-weight: 600;
@@ -321,7 +321,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   left: 0;
   z-index: 200;
   min-width: 272px;
-  background: #0d1526;
+  background: #111;
   border: 1px solid rgba(148, 163, 184, 0.25);
   border-radius: 1.25rem;
   padding: 1rem;
@@ -343,7 +343,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   height: 2rem;
   border: 1px solid rgba(148, 163, 184, 0.2);
   border-radius: 0.6rem;
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(15, 15, 15, 0.9);
   color: #e2e8f0;
   font-size: 1.1rem;
   line-height: 1;
@@ -472,7 +472,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .priority-button {
   flex: 1;
   border: 1px solid rgba(148, 163, 184, 0.24);
-  background: rgba(15, 23, 42, 0.72);
+  background: rgba(15, 15, 15, 0.85);
   color: #cbd5e1;
 }
 
@@ -557,7 +557,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 .empty-check {
-  color: #5eead4 !important;
+  color: #fb923c !important;
   font-size: 2.75rem;
   line-height: 1;
 }
@@ -568,7 +568,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   gap: 0.9rem;
   border: 1px solid rgba(148, 163, 184, 0.2);
   border-radius: 1.15rem;
-  background: rgba(15, 23, 42, 0.78);
+  background: rgba(15, 15, 15, 0.88);
   padding: 1rem;
   transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
 }
@@ -576,7 +576,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .task-card:hover {
   transform: translateY(-1px);
   border-color: rgba(251, 146, 60, 0.5);
-  background: rgba(15, 23, 42, 0.92);
+  background: rgba(20, 20, 20, 0.96);
 }
 
 .task-card.completed {
@@ -602,13 +602,13 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   flex: 0 0 auto;
   border: 2px solid #64748b;
   border-radius: 999px;
-  background: rgba(2, 6, 23, 0.8);
+  background: rgba(5, 5, 5, 0.9);
   color: #111827;
 }
 
 .check-button.checked {
-  border-color: #2dd4bf;
-  background: #2dd4bf;
+  border-color: #f97316;
+  background: #f97316;
 }
 
 .check-icon,
@@ -645,7 +645,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   align-items: center;
   gap: 0.35rem;
   border-radius: 999px;
-  background: rgba(2, 6, 23, 0.45);
+  background: rgba(5, 5, 5, 0.55);
   padding: 0.25rem 0.55rem;
   color: #cbd5e1;
   font-size: 0.7rem;
@@ -668,7 +668,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .due-label.red-400 { color: #fecaca; }
 .due-label.orange-400 { color: #fed7aa; }
 .due-label.yellow-400 { color: #fef08a; }
-.due-label.zinc-500 { color: #cbd5e1; }
+.due-label.zinc-500 { color: #94a3b8; }
 
 .delete-button {
   display: flex;
