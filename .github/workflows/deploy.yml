@@ -1,36 +1,41 @@
 name: Deploy to Cloudflare Pages
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
-      - claude/omkar-todo-app-D5lEt   # current default branch
+      - "claude/omkar-todo-app-D5lEt"
+    paths:
+      - "akshay-todo/**"
+      - ".github/workflows/deploy.yml"
 
 jobs:
   deploy:
     name: Build & Deploy
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: akshay-todo
 
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
           cache: npm
           cache-dependency-path: akshay-todo/package-lock.json
 
       - name: Install dependencies
         run: npm ci
+        working-directory: akshay-todo
 
       - name: Build
         run: npm run build
+        working-directory: akshay-todo
 
       - name: Deploy to Cloudflare Pages
-        run: npx wrangler pages deploy dist --project-name=akshay-todo --commit-dirty=true
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=akshay-todo
+          workingDirectory: akshay-todo
