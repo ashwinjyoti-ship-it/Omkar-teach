@@ -431,6 +431,56 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 
 .cal-clear:hover { background: rgba(248, 113, 113, 0.12); }
 
+/* ── Time picker popover ─────────────────────────────── */
+.tp-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 200;
+  width: 224px;
+  max-height: 272px;
+  overflow-y: auto;
+  background: #111;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 1.25rem;
+  padding: 0.75rem;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+  scrollbar-width: thin;
+  scrollbar-color: #ff6b00 #111;
+}
+
+.tp-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px;
+}
+
+.tp-slot {
+  padding: 0.42rem 0.4rem;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: #cbd5e1;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: background 100ms ease, border-color 100ms ease, color 100ms ease;
+}
+
+.tp-slot:hover {
+  background: rgba(251, 146, 60, 0.15);
+  border-color: rgba(251, 146, 60, 0.35);
+  color: #fff;
+}
+
+.tp-sel {
+  background: #f97316 !important;
+  border-color: #f97316 !important;
+  color: #111827 !important;
+  font-weight: 800;
+}
+
 .date-input {
   min-height: 2.85rem;
   padding: 0.75rem 0.9rem;
