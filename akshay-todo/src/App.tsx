@@ -365,8 +365,10 @@ function TodoApp() {
               <input
                 type="time"
                 value={dueTime}
-                onChange={(e) => setDueTime(e.target.value)}
-                disabled={!dueDate}
+                onChange={(e) => {
+                  setDueTime(e.target.value);
+                  if (e.target.value && !dueDate) setDueDate(todayMin);
+                }}
                 className="date-input"
               />
             </label>
