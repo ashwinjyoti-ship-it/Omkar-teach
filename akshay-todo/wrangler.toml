@@ -1,0 +1,8 @@
+name = "akshay-todo"
+compatibility_date = "2024-09-23"
+pages_build_output_dir = "./dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "akshay-todo-db"
+database_id = "a4b68412-183e-4471-8f3a-f2d259995864"

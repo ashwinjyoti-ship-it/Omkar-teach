@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS todos (
+  id TEXT PRIMARY KEY,
+  text TEXT NOT NULL,
+  priority TEXT NOT NULL DEFAULT 'medium',
+  completed INTEGER NOT NULL DEFAULT 0,
+  due_at INTEGER,
+  created_at INTEGER NOT NULL
+);
