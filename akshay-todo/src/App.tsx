@@ -1,5 +1,89 @@
 import { useState, useEffect, useRef, useCallback, Component, type ReactNode } from "react";
 
+// ── Calendar / DatePicker ─────────────────────────────────────────────────────
+const CAL_MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const CAL_DAYS   = ["Su","Mo","Tu","We","Th","Fr","Sa"];
+
+function CalendarPopover({ value, min, onChange, onClose }: {
+  value: string; min?: string;
+  onChange: (v: string) => void; onClose: () => void;
+}) {
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const init = value ? new Date(value + "T00:00") : new Date();
+  const [view, setView] = useState(() => new Date(init.getFullYear(), init.getMonth(), 1));
+  const yr = view.getFullYear(), mo = view.getMonth();
+  const firstDow = new Date(yr, mo, 1).getDay();
+  const dim = new Date(yr, mo + 1, 0).getDate();
+  const cells = Math.ceil((firstDow + dim) / 7) * 7;
+
+  function toStr(d: number) {
+    return `${yr}-${String(mo + 1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+  }
+
+  return (
+    <div className="cal-popover" onMouseDown={(e) => e.stopPropagation()}>
+      <div className="cal-nav">
+        <button type="button" onClick={() => setView(new Date(yr, mo - 1, 1))}>‹</button>
+        <span>{CAL_MONTHS[mo]} {yr}</span>
+        <button type="button" onClick={() => setView(new Date(yr, mo + 1, 1))}>›</button>
+      </div>
+      <div className="cal-grid">
+        {CAL_DAYS.map(d => <span key={d} className="cal-dow">{d}</span>)}
+        {Array.from({ length: cells }, (_, i) => {
+          const day = i - firstDow + 1;
+          if (day < 1 || day > dim) return <span key={i} className="cal-empty" />;
+          const s = toStr(day);
+          const past = !!min && s < min;
+          return (
+            <button key={i} type="button" disabled={past} onClick={() => { onChange(s); onClose(); }}
+              className={`cal-day${s === value ? " cal-sel" : ""}${s === todayStr && s !== value ? " cal-today" : ""}${past ? " cal-past" : ""}`}>
+              {day}
+            </button>
+          );
+        })}
+      </div>
+      {value && <button type="button" className="cal-clear" onClick={() => { onChange(""); onClose(); }}>Clear date</button>}
+    </div>
+  );
+}
+
+function DatePickerField({ label, value, min, onChange }: {
+  label: string; value: string; min?: string; onChange: (v: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const fn = (e: MouseEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", fn);
+    return () => document.removeEventListener("mousedown", fn);
+  }, [open]);
+
+  const display = value
+    ? new Date(value + "T00:00").toLocaleDateString(undefined, { weekday:"short", month:"short", day:"numeric" })
+    : null;
+
+  return (
+    <label className="field-group">
+      <span className="field-label">{label}</span>
+      <div ref={wrapRef} className="dp-wrap">
+        <button type="button" className={`dp-btn${value ? " dp-has-val" : ""}`} onClick={() => setOpen(v => !v)}>
+          <svg className="dp-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <rect x="2" y="4" width="16" height="14" rx="2"/>
+            <path d="M2 8h16M7 2v4M13 2v4"/>
+          </svg>
+          <span className="dp-text">{display ?? "Pick a date"}</span>
+          {value && <span className="dp-x" role="button" aria-label="Clear" onClick={(e) => { e.stopPropagation(); onChange(""); }}>×</span>}
+        </button>
+        {open && <CalendarPopover value={value} min={min} onChange={onChange} onClose={() => setOpen(false)} />}
+      </div>
+    </label>
+  );
+}
+
 // ── Error boundary so a crash shows a message instead of blank white ──────────
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: string | null }> {
   state = { error: null };
@@ -102,24 +186,20 @@ function TodoApp() {
   const notified = useRef(new Set<string>());
 
   useEffect(() => {
-    // Load todos
     fetch("/api/todos")
       .then((r) => (r.ok ? r.json() : []))
       .then((data) => setTodos(data as Todo[]))
       .catch(() => setTodos([]))
       .finally(() => setLoading(false));
 
-    // Reminder tick
     const interval = setInterval(() => setTick((t) => t + 1), 30_000);
 
-    // PWA install prompt
     const onPrompt = (e: Event) => {
       e.preventDefault();
       setInstallPrompt(e as BeforeInstallPromptEvent);
     };
     window.addEventListener("beforeinstallprompt", onPrompt);
 
-    // Service worker
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("/sw.js").catch(() => {});
     }
@@ -270,29 +350,24 @@ function TodoApp() {
           />
 
           <div className="schedule-row">
-            <input
-              type="date"
+            <DatePickerField
+              label="Due date"
               value={dueDate}
               min={todayMin}
-              onChange={(e) => setDueDate(e.target.value)}
-              className="date-input"
+              onChange={(v) => { setDueDate(v); if (!v) setDueTime(""); }}
             />
-            <input
-              type="time"
-              value={dueTime}
-              onChange={(e) => setDueTime(e.target.value)}
-              disabled={!dueDate}
-              className="date-input"
-            />
-            {dueDate && (
-              <button
-                onClick={() => { setDueDate(""); setDueTime(""); }}
-                className="clear-date"
-                aria-label="Clear deadline"
-              >
-                ×
-              </button>
-            )}
+            <label className="field-group">
+              <span className="field-label">Time <span className="field-label-hint">(optional)</span></span>
+              <input
+                type="time"
+                value={dueTime}
+                onChange={(e) => {
+                  setDueTime(e.target.value);
+                  if (e.target.value && !dueDate) setDueDate(todayMin);
+                }}
+                className="date-input"
+              />
+            </label>
           </div>
 
           <div className="priority-row">
@@ -328,7 +403,8 @@ function TodoApp() {
             </button>
           ))}
           <button
-            onClick={() => setShowDone((v) => !v)}
+            onClick={() => setShowDone((v) => !v)
+            }
             className="filter-chip toggle-done"
           >
             {showDone ? "Hide done" : "Show done"}

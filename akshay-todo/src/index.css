@@ -10,11 +10,14 @@ body {
     radial-gradient(circle at bottom right, rgba(20, 184, 166, 0.12), transparent 30rem),
     #071018;
   color: #f8fafc;
-  font-family: "Plus Jakarta Sans", "Aptos", "Segoe UI", sans-serif;
+  font-family: "Open Sans", "Segoe UI", system-ui, sans-serif;
+  font-size: 16px;
   min-height: 100vh;
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1, "liga" 1;
 }
 
 #root { min-height: 100dvh; }
@@ -70,19 +73,20 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .eyebrow {
   margin: 0 0 0.5rem;
   color: #fdba74;
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.14em;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
 }
 
 .hero-card h1 {
   margin: 0;
   color: #f8fafc;
-  font-size: clamp(2rem, 7vw, 4.75rem);
-  font-weight: 900;
-  line-height: 0.95;
-  letter-spacing: -0.07em;
+  font-style: italic;
+  font-size: clamp(2.1rem, 7.5vw, 4.5rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
 }
 
 .hero-card h1 span {
@@ -91,10 +95,12 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 
 .hero-text {
   max-width: 36rem;
-  margin: 0.9rem 0 0;
+  margin: 0.75rem 0 0;
   color: #cbd5e1;
-  font-size: clamp(0.95rem, 2vw, 1.1rem);
-  line-height: 1.6;
+  font-size: clamp(0.9rem, 2vw, 1rem);
+  font-weight: 400;
+  line-height: 1.65;
+  letter-spacing: 0.01em;
 }
 
 .hero-actions {
@@ -198,7 +204,8 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   min-height: 3.5rem;
   padding: 0.95rem 1rem;
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
 
 .task-input::placeholder,
@@ -220,16 +227,215 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 .schedule-row {
-  align-items: center;
+  align-items: flex-end;
 }
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+}
+
+.field-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  padding-left: 0.25rem;
+}
+
+.field-label-hint {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: #64748b;
+}
+
+/* ── DatePicker button ───────────────────────────────── */
+.dp-wrap {
+  position: relative;
+}
+
+.dp-btn {
+  width: 100%;
+  min-height: 2.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 1rem;
+  background: rgba(2, 6, 23, 0.86);
+  color: #64748b;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 160ms ease, color 160ms ease;
+}
+
+.dp-btn:hover {
+  border-color: rgba(251, 146, 60, 0.5);
+  color: #e2e8f0;
+}
+
+.dp-btn.dp-has-val {
+  color: #e2e8f0;
+  border-color: rgba(251, 146, 60, 0.45);
+}
+
+.dp-icon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  color: #fb923c;
+  stroke: currentColor;
+}
+
+.dp-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dp-x {
+  flex-shrink: 0;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0 0.2rem;
+}
+
+.dp-x:hover { color: #fca5a5; }
+
+/* ── Calendar popover ────────────────────────────────── */
+.cal-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 200;
+  min-width: 272px;
+  background: #0d1526;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 1.25rem;
+  padding: 1rem;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+}
+
+.cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  color: #f8fafc;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.cal-nav button {
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 0.6rem;
+  background: rgba(15, 23, 42, 0.8);
+  color: #e2e8f0;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.cal-nav button:hover {
+  background: rgba(251, 146, 60, 0.15);
+  border-color: rgba(251, 146, 60, 0.4);
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+
+.cal-dow {
+  text-align: center;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #475569;
+  padding: 0.25rem 0;
+  text-transform: uppercase;
+}
+
+.cal-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: background 100ms ease, border-color 100ms ease, color 100ms ease;
+}
+
+.cal-day:hover:not(:disabled) {
+  background: rgba(251, 146, 60, 0.15);
+  border-color: rgba(251, 146, 60, 0.35);
+  color: #fff;
+}
+
+.cal-today {
+  border-color: rgba(251, 146, 60, 0.55) !important;
+  color: #fb923c !important;
+  font-weight: 800;
+}
+
+.cal-sel {
+  background: #f97316 !important;
+  border-color: #f97316 !important;
+  color: #111827 !important;
+  font-weight: 800;
+}
+
+.cal-past {
+  opacity: 0.28;
+  cursor: not-allowed;
+}
+
+.cal-empty {
+  pointer-events: none;
+}
+
+.cal-clear {
+  margin-top: 0.65rem;
+  width: 100%;
+  padding: 0.45rem;
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  border-radius: 0.75rem;
+  background: transparent;
+  color: #fca5a5;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.cal-clear:hover { background: rgba(248, 113, 113, 0.12); }
 
 .date-input {
   min-height: 2.85rem;
   padding: 0.75rem 0.9rem;
   color-scheme: dark;
   color: #e2e8f0;
-  font-size: 0.9rem;
-  font-weight: 700;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 .date-input:disabled {
@@ -417,9 +623,10 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .task-title {
   margin: 0;
   color: #f8fafc;
-  font-size: 1rem;
-  font-weight: 800;
-  line-height: 1.45;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0.005em;
   overflow-wrap: anywhere;
 }
 
@@ -439,8 +646,10 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   background: rgba(2, 6, 23, 0.45);
   padding: 0.25rem 0.55rem;
   color: #cbd5e1;
-  font-size: 0.74rem;
-  font-weight: 800;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .priority-dot {
