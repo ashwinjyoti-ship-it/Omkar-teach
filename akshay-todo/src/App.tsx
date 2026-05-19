@@ -270,20 +270,26 @@ function TodoApp() {
           />
 
           <div className="schedule-row">
-            <input
-              type="date"
-              value={dueDate}
-              min={todayMin}
-              onChange={(e) => setDueDate(e.target.value)}
-              className="date-input"
-            />
-            <input
-              type="time"
-              value={dueTime}
-              onChange={(e) => setDueTime(e.target.value)}
-              disabled={!dueDate}
-              className="date-input"
-            />
+            <label className="field-group">
+              <span className="field-label">Due date</span>
+              <input
+                type="date"
+                value={dueDate}
+                min={todayMin}
+                onChange={(e) => setDueDate(e.target.value)}
+                className="date-input"
+              />
+            </label>
+            <label className="field-group">
+              <span className="field-label">Time <span className="field-label-hint">(optional)</span></span>
+              <input
+                type="time"
+                value={dueTime}
+                onChange={(e) => setDueTime(e.target.value)}
+                disabled={!dueDate}
+                className="date-input"
+              />
+            </label>
             {dueDate && (
               <button
                 onClick={() => { setDueDate(""); setDueTime(""); }}
