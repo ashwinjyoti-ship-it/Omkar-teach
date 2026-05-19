@@ -229,7 +229,30 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 .schedule-row {
-  align-items: center;
+  align-items: flex-end;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+}
+
+.field-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  padding-left: 0.25rem;
+}
+
+.field-label-hint {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: #64748b;
 }
 
 .date-input {
