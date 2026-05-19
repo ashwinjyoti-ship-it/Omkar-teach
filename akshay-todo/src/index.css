@@ -10,8 +10,9 @@ body {
     radial-gradient(circle at bottom right, rgba(20, 184, 166, 0.12), transparent 30rem),
     #071018;
   color: #f8fafc;
+  /* Open Sans mirrors Richmond Medium Italic — the Ask Jeeves brand typeface */
   font-family: "Open Sans", "Segoe UI", system-ui, sans-serif;
-  font-size: 16px;
+  font-size: 16px; /* base for rem, prevents iOS zoom on inputs */
   min-height: 100vh;
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
@@ -82,6 +83,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .hero-card h1 {
   margin: 0;
   color: #f8fafc;
+  /* Bold italic — the Ask Jeeves Richmond Medium Italic spirit */
   font-style: italic;
   font-size: clamp(2.1rem, 7.5vw, 4.5rem);
   font-weight: 800;
@@ -203,7 +205,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .task-input {
   min-height: 3.5rem;
   padding: 0.95rem 1rem;
-  font-size: 1rem;
+  font-size: 1rem; /* 16px — prevents iOS auto-zoom */
   font-weight: 600;
   letter-spacing: 0.01em;
 }
@@ -434,7 +436,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   padding: 0.75rem 0.9rem;
   color-scheme: dark;
   color: #e2e8f0;
-  font-size: 1rem;
+  font-size: 1rem; /* 16px — prevents iOS auto-zoom */
   font-weight: 600;
 }
 
@@ -623,7 +625,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .task-title {
   margin: 0;
   color: #f8fafc;
-  font-size: 0.9375rem;
+  font-size: 0.9375rem; /* 15px — comfortable mobile read size */
   font-weight: 600;
   line-height: 1.5;
   letter-spacing: 0.005em;
@@ -723,6 +725,10 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   .schedule-row,
   .priority-row {
     flex-direction: column;
+  }
+
+  .schedule-row {
+    align-items: stretch;
   }
 
   .add-button {
