@@ -15,30 +15,34 @@ interface Todo {
 
 const PRIORITY_CONFIG: Record<
   Priority,
-  { label: string; color: string; dot: string; order: number }
+  { label: string; color: string; dot: string; badge: string; order: number }
 > = {
   critical: {
     label: "Critical",
-    color: "text-red-400",
-    dot: "bg-red-500",
+    color: "text-red-300",
+    dot: "bg-red-400",
+    badge: "bg-red-500/15 border-red-500/40",
     order: 0,
   },
   high: {
     label: "High",
-    color: "text-orange-400",
-    dot: "bg-orange-500",
+    color: "text-orange-300",
+    dot: "bg-orange-400",
+    badge: "bg-orange-500/15 border-orange-500/40",
     order: 1,
   },
   medium: {
     label: "Medium",
-    color: "text-yellow-400",
-    dot: "bg-yellow-500",
+    color: "text-amber-300",
+    dot: "bg-amber-400",
+    badge: "bg-amber-500/15 border-amber-500/40",
     order: 2,
   },
   low: {
     label: "Low",
-    color: "text-green-400",
-    dot: "bg-green-600",
+    color: "text-emerald-300",
+    dot: "bg-emerald-400",
+    badge: "bg-emerald-500/15 border-emerald-500/40",
     order: 3,
   },
 };
@@ -48,22 +52,20 @@ function uid() {
 }
 
 export default function TodoApp() {
-  const [todos, setTodos] = useState<Todo[]>([]);
+  const [todos, setTodos] = useState<Todo[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const saved = localStorage.getItem("omkar-todos");
+      return saved ? (JSON.parse(saved) as Todo[]) : [];
+    } catch {
+      return [];
+    }
+  });
   const [input, setInput] = useState("");
   const [priority, setPriority] = useState<Priority>("medium");
   const [filter, setFilter] = useState<FilterPriority>("all");
   const [showCompleted, setShowCompleted] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  // Persist to localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem("omkar-todos");
-    if (saved) {
-      try {
-        setTodos(JSON.parse(saved));
-      } catch {}
-    }
-  }, []);
 
   useEffect(() => {
     localStorage.setItem("omkar-todos", JSON.stringify(todos));
@@ -72,6 +74,7 @@ export default function TodoApp() {
   function addTodo() {
     const text = input.trim();
     if (!text) return;
+
     setTodos((prev) => [
       { id: uid(), text, priority, completed: false, createdAt: Date.now() },
       ...prev,
@@ -82,228 +85,195 @@ export default function TodoApp() {
 
   function toggleTodo(id: string) {
     setTodos((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
+      prev.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      )
     );
   }
 
   function deleteTodo(id: string) {
-    setTodos((prev) => prev.filter((t) => t.id !== id));
+    setTodos((prev) => prev.filter((todo) => todo.id !== id));
   }
 
   function clearCompleted() {
-    setTodos((prev) => prev.filter((t) => !t.completed));
+    setTodos((prev) => prev.filter((todo) => !todo.completed));
   }
 
   const filtered = todos
-    .filter((t) => filter === "all" || t.priority === filter)
-    .filter((t) => showCompleted || !t.completed)
+    .filter((todo) => filter === "all" || todo.priority === filter)
+    .filter((todo) => showCompleted || !todo.completed)
     .sort((a, b) => {
-      if (a.completed !== b.completed)
-        return a.completed ? 1 : -1;
+      if (a.completed !== b.completed) return a.completed ? 1 : -1;
       return (
-        PRIORITY_CONFIG[a.priority].order -
-        PRIORITY_CONFIG[b.priority].order ||
+        PRIORITY_CONFIG[a.priority].order - PRIORITY_CONFIG[b.priority].order ||
         b.createdAt - a.createdAt
       );
     });
 
   const counts: Record<FilterPriority, number> = {
-    all: todos.filter((t) => !t.completed).length,
-    critical: todos.filter((t) => t.priority === "critical" && !t.completed)
+    all: todos.filter((todo) => !todo.completed).length,
+    critical: todos.filter(
+      (todo) => todo.priority === "critical" && !todo.completed
+    ).length,
+    high: todos.filter((todo) => todo.priority === "high" && !todo.completed)
       .length,
-    high: todos.filter((t) => t.priority === "high" && !t.completed).length,
-    medium: todos.filter((t) => t.priority === "medium" && !t.completed)
+    medium: todos.filter(
+      (todo) => todo.priority === "medium" && !todo.completed
+    ).length,
+    low: todos.filter((todo) => todo.priority === "low" && !todo.completed)
       .length,
-    low: todos.filter((t) => t.priority === "low" && !t.completed).length,
   };
 
-  const completedCount = todos.filter((t) => t.completed).length;
+  const completedCount = todos.filter((todo) => todo.completed).length;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
-      {/* Header */}
-      <header className="border-b border-[#1e1e1e] bg-[#0d0d0d]">
-        <div className="max-w-2xl mx-auto px-4 py-5 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">
-              <span className="text-[#ff6b00]">Omkar</span>{" "}
-              <span className="text-white">TODO</span>
-            </h1>
-            <p className="text-xs text-[#555] mt-0.5">
-              {counts.all} pending · {completedCount} done
-            </p>
-          </div>
-          {completedCount > 0 && (
-            <button
-              onClick={clearCompleted}
-              className="text-xs text-[#555] hover:text-red-400 transition-colors px-2 py-1 rounded border border-[#222] hover:border-red-900"
-            >
-              Clear done
-            </button>
-          )}
-        </div>
-      </header>
-
-      <main className="max-w-2xl mx-auto px-4 py-6 space-y-5">
-        {/* Add Task */}
-        <div className="bg-[#111] border border-[#1e1e1e] rounded-xl p-4 space-y-3">
-          <input
-            ref={inputRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && addTodo()}
-            placeholder="What needs to be done?"
-            className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg px-4 py-3 text-sm text-white placeholder-[#444] focus:outline-none focus:border-[#ff6b00] transition-colors"
-          />
-          <div className="flex items-center gap-2">
-            {(["critical", "high", "medium", "low"] as Priority[]).map((p) => (
-              <button
-                key={p}
-                onClick={() => setPriority(p)}
-                className={`flex-1 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-                  priority === p
-                    ? `border-[#ff6b00] bg-[#ff6b00]/10 ${PRIORITY_CONFIG[p].color}`
-                    : "border-[#222] text-[#444] hover:border-[#333] hover:text-[#666]"
-                }`}
-              >
-                {PRIORITY_CONFIG[p].label}
-              </button>
-            ))}
-            <button
-              onClick={addTodo}
-              disabled={!input.trim()}
-              className="px-5 py-1.5 bg-[#ff6b00] hover:bg-[#ff8c33] disabled:opacity-30 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-lg transition-colors"
-            >
-              Add
-            </button>
-          </div>
-        </div>
-
-        {/* Filters */}
-        <div className="flex items-center gap-2 flex-wrap">
-          {(
-            ["all", "critical", "high", "medium", "low"] as FilterPriority[]
-          ).map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-3 py-1 rounded-full text-xs font-medium border transition-all ${
-                filter === f
-                  ? "bg-[#ff6b00] border-[#ff6b00] text-white"
-                  : "border-[#222] text-[#555] hover:border-[#444] hover:text-[#888]"
-              }`}
-            >
-              {f === "all" ? "All" : PRIORITY_CONFIG[f].label}
-              <span className="ml-1.5 opacity-70">{counts[f]}</span>
-            </button>
-          ))}
-          <button
-            onClick={() => setShowCompleted((v) => !v)}
-            className={`ml-auto px-3 py-1 rounded-full text-xs font-medium border transition-all ${
-              showCompleted
-                ? "border-[#222] text-[#555] hover:border-[#444]"
-                : "bg-[#1a1a1a] border-[#333] text-[#888]"
-            }`}
-          >
-            {showCompleted ? "Hide done" : "Show done"}
-          </button>
-        </div>
-
-        {/* Task List */}
-        <div className="space-y-2">
-          {filtered.length === 0 && (
-            <div className="text-center py-16 text-[#333]">
-              <p className="text-4xl mb-3">✓</p>
-              <p className="text-sm">No tasks here</p>
+    <div className="min-h-screen bg-slate-950 text-slate-100">
+      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+        <header className="rounded-2xl border border-white/10 bg-slate-900/80 p-6 shadow-xl shadow-black/20 backdrop-blur">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-indigo-300/90">
+                Personal planner
+              </p>
+              <h1 className="mt-1 text-3xl font-semibold tracking-tight text-white">
+                Omkar Taskboard
+              </h1>
+              <p className="mt-2 text-sm text-slate-400">
+                {counts.all} pending · {completedCount} completed
+              </p>
             </div>
-          )}
-          {filtered.map((todo) => (
-            <div
-              key={todo.id}
-              className={`group flex items-start gap-3 bg-[#111] border rounded-xl px-4 py-3 transition-all ${
-                todo.completed
-                  ? "border-[#161616] opacity-50"
-                  : "border-[#1e1e1e] hover:border-[#2a2a2a]"
-              }`}
-            >
-              {/* Checkbox */}
+            {completedCount > 0 && (
               <button
-                onClick={() => toggleTodo(todo.id)}
-                className={`mt-0.5 w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all ${
-                  todo.completed
-                    ? "bg-[#ff6b00] border-[#ff6b00]"
-                    : "border-[#333] hover:border-[#ff6b00]"
-                }`}
+                onClick={clearCompleted}
+                className="rounded-lg border border-rose-400/25 bg-rose-500/10 px-3 py-2 text-xs font-medium text-rose-200 transition hover:bg-rose-500/20"
               >
-                {todo.completed && (
-                  <svg
-                    className="w-3 h-3 text-white"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={3}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                )}
+                Clear completed
               </button>
+            )}
+          </div>
+        </header>
 
-              {/* Content */}
-              <div className="flex-1 min-w-0">
-                <p
-                  className={`text-sm leading-relaxed break-words ${
-                    todo.completed ? "line-through text-[#444]" : "text-white"
+        <main className="mt-6 space-y-5">
+          <section className="rounded-2xl border border-white/10 bg-slate-900/70 p-4 sm:p-5">
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <input
+                ref={inputRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && addTodo()}
+                placeholder="Add a clear, actionable task"
+                className="h-11 flex-1 rounded-xl border border-white/10 bg-slate-950 px-4 text-sm text-slate-100 placeholder:text-slate-500 focus:border-indigo-400/70 focus:outline-none"
+              />
+              <button
+                onClick={addTodo}
+                disabled={!input.trim()}
+                className="h-11 rounded-xl bg-indigo-500 px-5 text-sm font-medium text-white transition hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Add task
+              </button>
+            </div>
+
+            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {(["critical", "high", "medium", "low"] as Priority[]).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setPriority(p)}
+                  className={`rounded-lg border px-3 py-2 text-xs font-medium transition ${
+                    priority === p
+                      ? `${PRIORITY_CONFIG[p].badge} ${PRIORITY_CONFIG[p].color}`
+                      : "border-white/10 text-slate-400 hover:border-white/20 hover:text-slate-200"
                   }`}
                 >
-                  {todo.text}
-                </p>
-                <div className="flex items-center gap-1.5 mt-1">
-                  <span
-                    className={`w-1.5 h-1.5 rounded-full ${PRIORITY_CONFIG[todo.priority].dot}`}
-                  />
-                  <span
-                    className={`text-xs ${PRIORITY_CONFIG[todo.priority].color} opacity-70`}
-                  >
-                    {PRIORITY_CONFIG[todo.priority].label}
-                  </span>
-                </div>
-              </div>
-
-              {/* Delete */}
-              <button
-                onClick={() => deleteTodo(todo.id)}
-                className="opacity-0 group-hover:opacity-100 transition-opacity text-[#333] hover:text-red-500 p-0.5"
-                aria-label="Delete task"
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
+                  {PRIORITY_CONFIG[p].label}
+                </button>
+              ))}
             </div>
-          ))}
-        </div>
+          </section>
 
-        {/* Footer */}
-        {todos.length > 0 && (
-          <p className="text-center text-xs text-[#333] pb-4">
-            {todos.length} total tasks · data saved locally
-          </p>
-        )}
-      </main>
+          <section className="flex flex-wrap items-center gap-2">
+            {(["all", "critical", "high", "medium", "low"] as FilterPriority[]).map(
+              (item) => (
+                <button
+                  key={item}
+                  onClick={() => setFilter(item)}
+                  className={`rounded-full border px-3 py-1.5 text-xs transition ${
+                    filter === item
+                      ? "border-indigo-400/70 bg-indigo-500/20 text-indigo-100"
+                      : "border-white/10 text-slate-400 hover:border-white/20 hover:text-slate-200"
+                  }`}
+                >
+                  {item === "all" ? "All" : PRIORITY_CONFIG[item].label}
+                  <span className="ml-1.5 opacity-70">{counts[item]}</span>
+                </button>
+              )
+            )}
+
+            <button
+              onClick={() => setShowCompleted((value) => !value)}
+              className="ml-auto rounded-full border border-white/10 px-3 py-1.5 text-xs text-slate-300 transition hover:border-white/20"
+            >
+              {showCompleted ? "Hide completed" : "Show completed"}
+            </button>
+          </section>
+
+          <section className="space-y-2">
+            {filtered.length === 0 && (
+              <div className="rounded-2xl border border-dashed border-white/10 bg-slate-900/60 py-14 text-center text-slate-400">
+                No tasks in this view
+              </div>
+            )}
+
+            {filtered.map((todo) => (
+              <article
+                key={todo.id}
+                className={`group flex items-start gap-3 rounded-xl border px-4 py-3 transition ${
+                  todo.completed
+                    ? "border-white/10 bg-slate-900/40 opacity-60"
+                    : "border-white/10 bg-slate-900/80 hover:border-white/20"
+                }`}
+              >
+                <button
+                  onClick={() => toggleTodo(todo.id)}
+                  className={`mt-0.5 h-5 w-5 flex-shrink-0 rounded-full border-2 transition ${
+                    todo.completed
+                      ? "border-indigo-400 bg-indigo-400"
+                      : "border-slate-500 hover:border-indigo-300"
+                  }`}
+                  aria-label="Toggle task"
+                />
+
+                <div className="min-w-0 flex-1">
+                  <p
+                    className={`text-sm ${
+                      todo.completed ? "text-slate-500 line-through" : "text-slate-100"
+                    }`}
+                  >
+                    {todo.text}
+                  </p>
+                  <div className="mt-1.5 flex items-center gap-1.5">
+                    <span
+                      className={`h-1.5 w-1.5 rounded-full ${PRIORITY_CONFIG[todo.priority].dot}`}
+                    />
+                    <span
+                      className={`text-xs ${PRIORITY_CONFIG[todo.priority].color}`}
+                    >
+                      {PRIORITY_CONFIG[todo.priority].label}
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => deleteTodo(todo.id)}
+                  className="rounded-md p-1 text-slate-500 opacity-0 transition hover:bg-rose-500/10 hover:text-rose-300 group-hover:opacity-100"
+                  aria-label="Delete task"
+                >
+                  ✕
+                </button>
+              </article>
+            ))}
+          </section>
+        </main>
+      </div>
     </div>
   );
 }
